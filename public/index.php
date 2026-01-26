@@ -75,6 +75,68 @@
             width: 100%;
         }
 
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .hero-text {
+            max-width: 60%;
+        }
+
+        .hero-photo {
+            position: relative;
+            width: 340px;
+            height: 440px;
+            overflow: hidden;
+            border-radius: 160px 0 0 160px;
+
+            /* background bleed */
+            background: radial-gradient(circle at center,
+                    rgba(225, 6, 0, 0.25),
+                    rgba(0, 0, 0, 0.95) 70%);
+        }
+
+
+        .hero-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+
+            /* visual integration */
+            filter:
+                brightness(0.95) contrast(1.05) saturate(0.9);
+
+            /* fade edge into background */
+            -webkit-mask-image: radial-gradient(ellipse at center,
+                    black 95%,
+                    transparent 100%);
+
+            mask-image: radial-gradient(ellipse at center,
+                    black 95%,
+                    transparent 100%);
+        }
+
+        @media (max-width: 900px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero-text {
+                max-width: 100%;
+            }
+
+            .hero-photo {
+                margin-top: 30px;
+            }
+        }
+
+
+
+
         section {
             padding: 70px 10%;
         }
@@ -109,7 +171,7 @@
             align-items: center;
             justify-content: center;
             padding: 12px 16px;
-            
+
         }
 
         /* .skill:hover {
@@ -151,22 +213,29 @@
 
 <body>
 
-    <header>
-        <h1>Ankit Sharma</h1>
-        <p>
-            Software Engineer • Researcher • Educator
-            <br>
-            Building technology, knowledge systems, and tools that remove superstition and empower minds.
-        </p>
+    <header class="hero">
+        <div class="hero-text">
+            <h1>Ankit Sharma</h1>
+            <p>
+                Software Engineer • Researcher • Educator
+                <br>
+                Building technology, knowledge systems, and tools that remove superstition and empower minds.
+            </p>
 
-        <nav>
-            <a href="#about">About</a>
-            <a href="#skills">Skills</a>
-            <a href="#projects">Projects</a>
-            <a href="#vision">Vision</a>
-            <a href="#contact">Contact</a>
-        </nav>
+            <nav>
+                <a href="#about">About</a>
+                <a href="#skills">Skills</a>
+                <a href="#projects">Projects</a>
+                <a href="#vision">Vision</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+
+        <div class="hero-photo">
+            <img src="../uploads/social.jpg" alt="Ankit Sharma">
+        </div>
     </header>
+
     <section id="about">
         <h2>About Me</h2>
         <div class="card" id="about-text">
