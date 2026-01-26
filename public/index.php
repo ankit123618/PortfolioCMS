@@ -243,7 +243,7 @@
                 document.getElementById('projects-list').innerHTML =
                     data.map(p => `
         <div class="card">
-          ${p.image ? `<img src="/../uploads/${p.image}" style="width:100%;border-radius:12px;margin-bottom:10px;">` : ''}
+          ${p.image ? `<img src="../uploads/${p.image}" style="width:100%;border-radius:12px;margin-bottom:10px;">` : ''}
           <h3>${p.title}</h3>
           <p>${p.description}</p>
         </div>
