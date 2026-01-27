@@ -79,7 +79,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 40px;
+            gap: 40px; 
         }
 
         .hero-text {
@@ -91,7 +91,7 @@
             width: 340px;
             height: 440px;
             overflow: hidden;
-            border-radius: 160px 0 0 160px;
+            border-radius: 100%;
 
             /* background bleed */
             background: radial-gradient(circle at center,

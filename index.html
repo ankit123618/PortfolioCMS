@@ -82,7 +82,13 @@
       align-items: center;
       justify-content: space-between;
       gap: 40px;
+      position: relative;
+      background:
+        radial-gradient(circle at 70% 50%,
+          rgba(225, 6, 0, 0.25),
+          rgba(0, 0, 0, 1) 70%);
     }
+
 
     .hero-text {
       max-width: 60%;
@@ -90,12 +96,12 @@
 
     .hero-photo {
       position: relative;
+      z-index: 2;
+      background: transparent;
       width: 340px;
       height: 440px;
       overflow: hidden;
-      border-radius: 160px 0 0 160px;
-
-      /* background bleed */
+      border-radius: 100%;
       background: radial-gradient(circle at center,
           rgba(225, 6, 0, 0.25),
           rgba(0, 0, 0, 0.95) 70%);
@@ -107,19 +113,31 @@
       height: 100%;
       object-fit: cover;
 
-      /* visual integration */
+      /* tonal unification */
       filter:
-        brightness(0.95) contrast(1.05) saturate(0.9);
+        brightness(0.92) contrast(1.08) saturate(0.85);
 
-      /* fade edge into background */
+      /* dissolve into background */
       -webkit-mask-image: radial-gradient(ellipse at center,
-          black 95%,
+          black 60%,
           transparent 100%);
 
       mask-image: radial-gradient(ellipse at center,
-          black 95%,
+          black 60%,
           transparent 100%);
     }
+
+
+    .hero-photo::before {
+      content: '';
+      position: absolute;
+      inset: -40px;
+      background: radial-gradient(ellipse at center,
+          rgba(225, 6, 0, 0.2),
+          transparent 70%);
+      z-index: -1;
+    }
+
 
     @media (max-width: 900px) {
       .hero {
@@ -221,7 +239,7 @@
     </div>
 
     <div class="hero-photo">
-      <img src="uploads/social.jpg" alt="Ankit Sharma">
+      <img src="uploads/ChatGPT Image Jan 27, 2026, 02_01_41 PM.png" alt="Ankit Sharma">
     </div>
   </header>
 
