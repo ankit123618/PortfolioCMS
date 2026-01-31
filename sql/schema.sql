@@ -23,10 +23,17 @@ description TEXT
 
 CREATE TABLE site_content (
   id INT PRIMARY KEY,
+  header TEXT,
+  tag VARCHAR(100),
+  navigation_links TEXT,
+  photo VARCHAR(255),
   about TEXT,
   vision TEXT,
   email VARCHAR(255),
   github VARCHAR(255),
-  youtube VARCHAR(255)
+  youtube VARCHAR(255),
+  footer TEXT,
 );
+
+
 

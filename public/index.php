@@ -79,7 +79,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 40px; 
+            gap: 40px;
         }
 
         .hero-text {
@@ -215,24 +215,24 @@
 
     <header class="hero">
         <div class="hero-text">
-            <h1>Ankit Sharma</h1>
-            <p>
-                Software Engineer • Researcher • Educator
+            <h1 id="site-header"></h1>
+            <p id="site-tag">
+                 <!-- Software Engineer • Researcher • Educator
                 <br>
-                Building technology, knowledge systems, and tools that remove superstition and empower minds.
+                Building technology, knowledge systems, and tools that remove superstition and empower minds. -->
             </p>
 
-            <nav>
-                <a href="#about">About</a>
+            <nav id="site-nav">
+                <!-- <a href="#about">About</a>
                 <a href="#skills">Skills</a>
                 <a href="#projects">Projects</a>
                 <a href="#vision">Vision</a>
-                <a href="#contact">Contact</a>
-            </nav>
+                <a href="#contact">Contact</a>  -->
+            </nav> 
         </div>
 
-        <div class="hero-photo">
-            <img src="../uploads/social.jpg" alt="Ankit Sharma">
+        <div class="hero-photo" >
+            <img id="site-photo" src="" alt="Ankit Sharma">
         </div>
     </header>
 
@@ -294,8 +294,8 @@
     </section>
 
 
-    <footer>
-        © 2026 Ankit Sharma • Built on Linux with clarity and purpose
+    <footer id="site-footer">
+        <!-- © 2026 Ankit Sharma • Built on Linux with clarity and purpose -->
     </footer>
 
     <script>
@@ -320,19 +320,52 @@
             });
     </script>
     <script>
-        fetch('api/get_content.php')
-            .then(r => r.json())
-            .then(d => {
-                document.getElementById('about-text').innerHTML = '<p>' + d.about + '</p>';
-                document.getElementById('vision-text').innerHTML = '<p>' + d.vision + '</p>';
+        (async () => {
+            try {
+                const res = await fetch('api/get_content.php');
+                if (!res.ok) throw new Error('API error');
+
+                const d = await res.json();
+                if (!d || Object.keys(d).length === 0) return;
+
+                // Header
+                document.getElementById('site-header').textContent = d.header ?? '';
+                document.getElementById('site-tag').textContent = d.tag ?? '';
+
+                // Navigation
+                if (d.navigation_links) {
+                    try {
+                        const links = JSON.parse(d.navigation_links);
+                        document.getElementById('site-nav').innerHTML =
+                            links.map(l => `<a href="${l.href}">${l.text}</a>`).join('');
+                    } catch (e) {
+                        console.error('Invalid navigation JSON', e);
+                    }
+                }
+
+                // Photo
+                if (d.photo) {
+                    const photoPath = '../uploads/' + d.photo;
+                    document.getElementById('site-photo').src = photoPath;
+                }
+
+                // About / Vision
+                document.getElementById('about-text').textContent = d.about ?? '';
+                document.getElementById('vision-text').textContent = d.vision ?? '';
+                // Contact
                 document.getElementById('contact').innerHTML = `
-                    <div class="card">
-                        <p>Email: <strong>${d.email}</strong></p>
-                        <p>GitHub: <strong>${d.github}</strong></p>
-                        <p>YouTube: <strong>${d.youtube}</strong></p>
-                    </div>
+                    <p>Email: <strong>${d.email ?? ''}</strong></p>
+                    <p>GitHub: <strong>${d.github ?? ''}</strong></p>
+                    <p>YouTube: <strong>${d.youtube ?? ''}</strong></p>
                 `;
-            });
+
+                // Footer
+                document.getElementById('site-footer').textContent = d.footer ?? '';
+
+            } catch (err) {
+                console.error('Frontend render failed:', err);
+            }
+        })();
     </script>
 
 
