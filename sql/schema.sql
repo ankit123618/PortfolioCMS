@@ -8,32 +8,21 @@ username VARCHAR(50) UNIQUE,
 password VARCHAR(255)
 );
 
-
-CREATE TABLE skills (
-id INT AUTO_INCREMENT PRIMARY KEY,
-name VARCHAR(100)
+CREATE TABLE pages (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  slug VARCHAR(50),
+  schema JSON,
+  updated_at TIMESTAMP
 );
 
-
-CREATE TABLE projects (
-id INT AUTO_INCREMENT PRIMARY KEY,
-title VARCHAR(200),
-description TEXT
+CREATE TABLE page_versions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  page_id INT NOT NULL,
+  schema LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  note VARCHAR(255) NULL
 );
 
-CREATE TABLE site_content (
-  id INT PRIMARY KEY,
-  header TEXT,
-  tag VARCHAR(100),
-  navigation_links TEXT,
-  photo VARCHAR(255),
-  about TEXT,
-  vision TEXT,
-  email VARCHAR(255),
-  github VARCHAR(255),
-  youtube VARCHAR(255),
-  footer TEXT,
-);
 
 
 

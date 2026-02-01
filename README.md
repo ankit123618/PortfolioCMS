@@ -1,85 +1,242 @@
-# Professional Admin Panel for Portfolio (Content‑Driven)
+# Portfolio CMS – Schema‑Driven Visual Admin Panel
 
-This backend **does NOT change your design or theme**. It only controls **content** (projects, skills, about text, vision, contact) via an admin panel and database.
+> **Status:** Production‑ready (single‑page portfolio CMS)
+>
+> **Core Idea:** Design is **never touched**. Only **content + rendering logic** is managed.
 
-Everything here is:
-
-* Linux‑friendly (Fedora)
-* Simple PHP (no frameworks)
-* Secure by default
-* Production‑ready
+This project has evolved from a simple admin panel into a **schema‑driven CMS** with a **visual editor**, image uploads, and dynamic sections — all stored in a single JSON schema per page.
 
 ---
 
-## 1. Tech Stack
+## 1. What This System Is (High‑Level)
 
-* **Frontend:** Existing HTML/CSS (unchanged)
-* **Backend:** PHP 8+
-* **Database:** MySQL / MariaDB
-* **Security:** password_hash, prepared statements
-* **Config:** `.env`
+This is **not** a page builder like WordPress.
+
+It is:
+
+* A **content system**
+* With **explicit rendering rules**
+* Stored as **JSON schema** in the database
+* Rendered by a **custom renderer** on the frontend
+
+You control:
+
+* What content exists
+* Where it renders
+* How it renders
+
+All without touching HTML/CSS layout.
 
 ---
 
-## 2. Folder Structure
+## 2. Key Features (Latest Version)
+
+### 🔧 Admin / Backend
+
+* Visual page editor (no raw JSON editing)
+* Auto‑filled data from DB
+* UTF‑8 safe schema storage
+* Image upload support
+
+  * Hero (header photo)
+  * Project images
+* Image preview before save
+* Add / Remove dynamically:
+
+  * Projects
+  * Skills
+  * Contact items
+* Safe schema merge (old data preserved)
+
+### 🎨 Frontend
+
+* Renderer driven entirely by schema
+* No hard‑coded content
+* No design changes required
+* Images served from `/uploads/`
+
+### 🧠 Architecture
+
+* One page = one schema
+* One schema = many sections
+* Each section:
+
+  * `id`
+  * `type`
+  * `enabled`
+  * `data`
+
+---
+
+## 3. Folder Structure (Current)
 
 ```
 portfolio/
 ├── admin/
-│   ├── login.php
-│   ├── dashboard.php
-│   ├── projects.php
-│   ├── skills.php
-│   ├── logout.php
+│   ├── page_editor_visual.php   # Main visual editor (core)
 │
 ├── api/
-│   ├── get_projects.php
-│   ├── get_skills.php
+│   └── get_page.php             # Fetch page schema by slug
 │
 ├── config/
-│   ├── db.php
-│   ├── auth.php
+│   └── db.php                   # PDO + utf8mb4
 │
 ├── public/
-│   ├── index.php   <-- your current design (HTML → PHP)
+│   ├── index.php                # Frontend entry
+│   ├── renderer.js              # Schema → HTML renderer
+│   └── style.css                # Your original theme
+│
+├── uploads/                      # All images (hero + projects)
 │
 ├── sql/
-│   ├── schema.sql
+│   └── schema.sql               # Database structure
 │
 ├── .env
 ├── .gitignore
-├── README.md
+└── README.md
 ```
 
 ---
 
-## 3. Database Schema (`sql/schema.sql`)
+## 4. Database Design
+
+### Table: `pages`
 
 ```sql
-CREATE DATABASE portfolio;
-USE portfolio;
-
-CREATE TABLE admin_users (
+CREATE TABLE pages (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(50) UNIQUE,
-  password VARCHAR(255)
-);
-
-CREATE TABLE skills (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100)
-);
-
-CREATE TABLE projects (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(200),
-  description TEXT
+  slug VARCHAR(50) UNIQUE,
+  schema LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  updated_at TIMESTAMP NULL
 );
 ```
 
+### Why `LONGTEXT + utf8mb4`
+
+* JSON schema can grow
+* Supports emojis, bullets, em‑dashes
+* Prevents UTF‑8 corruption
+
 ---
 
-## 4. Environment File (`.env`)
+## 5. Schema Philosophy
+
+Each page stores **one JSON schema**.
+
+Example (simplified):
+
+```json
+{
+  "page": "home",
+  "sections": [
+    {
+      "type": "hero",
+      "id": "hero",
+      "enabled": true,
+      "data": {
+        "title": "Ankit Sharma",
+        "tagline": "Software Engineer • Researcher • Educator",
+        "photo": "hero_123.jpg"
+      }
+    },
+    {
+      "type": "projects",
+      "id": "projects",
+      "enabled": true,
+      "data": {
+        "items": [
+          {
+            "title": "Fitness Platform",
+            "description": "Athlete‑first system",
+            "image": "project_1.jpg"
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+> ⚠️ JSON is **never** edited manually. Always saved via PHP `json_encode()`.
+
+---
+
+## 6. Visual Page Editor (`admin/page_editor_visual.php`)
+
+### What it does
+
+* Reads schema from DB
+* Decodes JSON → PHP array
+* Auto‑fills UI inputs
+* Allows visual editing
+* Rebuilds schema safely on save
+
+### Important rules implemented
+
+* **Old images preserved** if no new upload
+* Schema merged, not overwritten
+* Section matched by `id` (fallback to `type`)
+
+### Image Upload Logic
+
+* Files uploaded to `/uploads/`
+* Only filename stored in schema
+* Preview shown instantly via JS
+
+---
+
+## 7. Frontend Renderer (`public/renderer.js`)
+
+### Responsibility
+
+* Fetch schema from API
+* Loop sections
+* Render HTML per `type`
+
+### Example: Projects Renderer
+
+```js
+case 'projects':
+  section.innerHTML = data.items.map(p => `
+    <div class="card">
+      <img src="uploads/${p.image}">
+      <h3>${p.title}</h3>
+      <p>${p.description}</p>
+    </div>
+  `).join('');
+  break;
+```
+
+> Renderer never mutates data. It only reads schema.
+
+---
+
+## 8. UTF‑8 Safety (Critical)
+
+### Required
+
+* DB charset: `utf8mb4`
+* PDO DSN: `charset=utf8mb4`
+
+```php
+$pdo = new PDO(
+  "mysql:host=$host;dbname=$db;charset=utf8mb4",
+  $user,
+  $pass,
+  [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+);
+```
+
+### Why
+
+Prevents:
+
+* `Malformed UTF‑8 characters`
+* Broken JSON decode
+
+---
+
+## 9. .env
 
 ```env
 DB_HOST=localhost
@@ -90,146 +247,66 @@ DB_PASS=strongpassword
 
 ---
 
-## 5. Database Connection (`config/db.php`)
-
-```php
-<?php
-$env = parse_ini_file(__DIR__ . '/../.env');
-
-$pdo = new PDO(
-  "mysql:host={$env['DB_HOST']};dbname={$env['DB_NAME']}",
-  $env['DB_USER'],
-  $env['DB_PASS'],
-  [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-);
-```
-
----
-
-## 6. Admin Login (`admin/login.php`)
-
-```php
-<?php
-session_start();
-require '../config/db.php';
-
-if ($_POST) {
-  $stmt = $pdo->prepare("SELECT * FROM admin_users WHERE username=?");
-  $stmt->execute([$_POST['username']]);
-  $user = $stmt->fetch();
-
-  if ($user && password_verify($_POST['password'], $user['password'])) {
-    $_SESSION['admin'] = true;
-    header('Location: dashboard.php');
-    exit;
-  }
-}
-?>
-
-<form method="post">
-  <input name="username" placeholder="Username">
-  <input name="password" type="password" placeholder="Password">
-  <button>Login</button>
-</form>
-```
-
----
-
-## 7. Admin Dashboard (`admin/dashboard.php`)
-
-```php
-<?php session_start(); if(!$_SESSION['admin']) die('Access denied'); ?>
-<h2>Admin Panel</h2>
-<ul>
-  <li><a href="projects.php">Manage Projects</a></li>
-  <li><a href="skills.php">Manage Skills</a></li>
-  <li><a href="logout.php">Logout</a></li>
-</ul>
-```
-
----
-
-## 8. Example: Manage Projects (`admin/projects.php`)
-
-```php
-<?php
-session_start(); require '../config/db.php';
-if(!$_SESSION['admin']) die('Denied');
-
-if ($_POST) {
-  $stmt = $pdo->prepare("INSERT INTO projects (title, description) VALUES (?,?)");
-  $stmt->execute([$_POST['title'], $_POST['description']]);
-}
-
-$projects = $pdo->query("SELECT * FROM projects")->fetchAll();
-?>
-
-<form method="post">
-  <input name="title" placeholder="Project Title">
-  <textarea name="description"></textarea>
-  <button>Add</button>
-</form>
-
-<?php foreach($projects as $p): ?>
-  <p><b><?= $p['title'] ?></b></p>
-<?php endforeach; ?>
-```
-
----
-
-## 9. API for Frontend (`api/get_projects.php`)
-
-```php
-<?php
-require '../config/db.php';
-header('Content-Type: application/json');
-echo json_encode($pdo->query("SELECT * FROM projects")->fetchAll());
-```
-
----
-
-## 10. Frontend Usage (NO DESIGN CHANGE)
-
-Replace static cards with JS fetch:
-
-```html
-<script>
-fetch('/api/get_projects.php')
-.then(r=>r.json())
-.then(data=>{
-  const el = document.getElementById('projects');
-  el.innerHTML = data.map(p=>`<div class="card"><h3>${p.title}</h3><p>${p.description}</p></div>`).join('');
-});
-</script>
-```
-
----
-
-## 11. `.gitignore`
+## 10. .gitignore
 
 ```
 .env
-/vendor
+/uploads/*
 ```
 
 ---
 
-## 12. README.md (Summary)
+## 11. Design Guarantees
 
-* Admin Panel: `/admin/login.php`
-* Secure login
-* Content stored in DB
-* Frontend reads via API
-* Design untouched
+* ❌ No inline styles generated
+
+* ❌ No theme changes
+
+* ❌ No layout overrides
+
+* ✅ Only content changes
+
+* ✅ Renderer respects your CSS
+
+---
+
+## 12. Current Capabilities Summary
+
+✔ Schema‑driven pages
+✔ Visual editor
+✔ Image upload + preview
+✔ Add / remove items dynamically
+✔ Safe JSON storage
+✔ Clean frontend rendering
 
 ---
 
-## Next Steps
+## 13. Planned / Easy Extensions
 
-✔ Add About / Vision editor
-✔ Add image upload (projects)
-✔ Role‑based admin
-✔ Backup & export
-✔ Docker (optional)
+* Drag & drop reorder
+* Live preview (split screen)
+* Image delete button
+* Version history
+* Multi‑page support
 
 ---
+
+## 14. Mental Model (Important)
+
+> **Database stores intent.**
+>
+> **Renderer decides appearance.**
+
+This separation is the core strength of this system.
+
+---
+
+## Final Note
+
+This project is intentionally:
+
+* Minimal
+* Explicit
+* Understandable
+
+It is built to be **owned**, not abstracted away.

@@ -11,7 +11,7 @@ $user = $stmt->fetch();
 
 if ($user && password_verify($_POST['password'], $user['password'])) {
 $_SESSION['admin'] = true;
-header('Location: dashboard.php');
+header('Location: page_editor_visual.php');
 exit;
 }
 }
