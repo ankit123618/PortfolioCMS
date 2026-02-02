@@ -1,0 +1,28 @@
+CREATE DATABASE portfolio;
+USE portfolio;
+
+
+CREATE TABLE admin_users (
+id INT AUTO_INCREMENT PRIMARY KEY,
+username VARCHAR(50) UNIQUE,
+password VARCHAR(255)
+);
+
+CREATE TABLE pages (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  slug VARCHAR(50),
+  schema JSON,
+  updated_at TIMESTAMP
+);
+
+CREATE TABLE page_versions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  page_id INT NOT NULL,
+  schema LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  note VARCHAR(255) NULL
+);
+
+
+
+
