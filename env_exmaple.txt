@@ -1,4 +1,4 @@
 DB_PASS=secret  
 DB_NAME=portfolio
-DB_HOST=127.0.0.1
+DB_HOST=127.0.0.1  | db
 DB_USER=ankit

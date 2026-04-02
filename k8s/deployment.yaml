@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qr-generator
+spec:
+  replicas: 2   # number of containers
+  selector:
+    matchLabels:
+      app: qr-generator
+  template:
+    metadata:
+      labels:
+        app: qr-generator
+    spec:
+      containers:
+        - name: qr-generator
+          image: ankit123618/qr-generator:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80

@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - ../uploads:/var/www/html/uploads
+      - ../.env:/var/www/html/.env:ro
+    environment:
+      DB_HOST: DB_HOST
+      DB_NAME: DB_NAME
+      DB_USER: DB_USER
+      DB_PASS: DB_PASS
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: DB_ROOT_PASSWORD
+      MYSQL_DATABASE: DB_NAME
+      MYSQL_USER: DB_USER
+      MYSQL_PASSWORD: DB_PASS
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+
+volumes:
+  db_data:
