@@ -1,8 +1,8 @@
 <?php
 $envFile = __DIR__ . '/../.env';
 $env = [];
-if (file_exists($envFile)) {
-    $env = parse_ini_file($envFile) ?: [];
+if (is_readable($envFile)) {
+    $env = @parse_ini_file($envFile) ?: [];
 }
 
 $env['DB_HOST'] = getenv('DB_HOST') ?: ($env['DB_HOST'] ?? '127.0.0.1');

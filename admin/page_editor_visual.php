@@ -16,8 +16,11 @@ $slug = 'home';
 $stmt = $pdo->prepare("SELECT * FROM pages WHERE slug=? LIMIT 1");
 $stmt->execute([$slug]);
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
-$pageId = $row['id'];
+if (!$row) {
+    die('No page found for slug "home". Create a row in the pages table or import sql/schema.sql.');
+}
 
+$pageId = $row['id'];
 $schema = json_decode($row['schema'] ?? '{}', true);
 $sections = $schema['sections'] ?? [];
 
@@ -142,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $schema['sections'] = $sections;
 
     $versionStmt = $pdo->prepare(
-        "INSERT INTO page_versions (page_id, schema, note)
+        "INSERT INTO page_versions (page_id, `schema`, note)
      VALUES (:page_id, :schema, :note)"
     );
 
@@ -157,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
     $stmt = $pdo->prepare(
-        "UPDATE pages SET schema=?, updated_at=NOW() WHERE slug=?"
+        "UPDATE pages SET `schema`=?, updated_at=NOW() WHERE slug=?"
     );
     $stmt->execute([
         json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
@@ -324,10 +327,6 @@ if (empty($projectItems)) {
         <button type="submit">Save Changes</button>
 
     </form>
-    <script src="../public/js/preview.js"></script>
-    <script src="../public/js/projects.js"></script>
-    <script src="../public/js/skills.js"></script>
-    <script src="../public/js/contacts.js"></script>
 </body>
 
 </html>

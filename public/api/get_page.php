@@ -7,7 +7,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 $slug = $_GET['slug'] ?? 'home';
 
-$stmt = $pdo->prepare("SELECT schema FROM pages WHERE slug = ? LIMIT 1");
+$stmt = $pdo->prepare("SELECT `schema` FROM pages WHERE slug = ? LIMIT 1");
 $stmt->execute([$slug]);
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 

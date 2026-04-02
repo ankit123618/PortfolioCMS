@@ -10,7 +10,7 @@
 
 const app = document.getElementById('app');
 
-fetch('api/get_page.php?slug=home')
+fetch('/../public/api/get_page.php?slug=home')
   .then(r => r.json())
   .then(page => {
     if (!page.sections) return;
