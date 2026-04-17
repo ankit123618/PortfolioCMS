@@ -26,10 +26,10 @@ A simple Go portfolio CMS with:
 
 1. Create the database and tables
 
-   Import `sql/schema.sql` into your MySQL database:
+   Import `sql/portfolio.sql` into your MySQL database:
 
    ```bash
-   mysql -u <user> -p < sql/schema.sql
+   mysql -u <user> -p < sql/portfolio.sql
    ```
 
 2. Configure environment values
