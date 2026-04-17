@@ -32,12 +32,12 @@ jobs:
             # 3. Build Docker image
             - name: Build image
               run: |
-                  docker build -t ${{ secrets.DOCKER_USERNAME }}/PortfolioCMS:latest \
-                  -t ${{ secrets.DOCKER_USERNAME }}/PortfolioCMS:${{ github.sha }} .
+                  docker build -t ${{ secrets.DOCKER_USERNAME }}/portfolio-app:latest \
+                  -t ${{ secrets.DOCKER_USERNAME }}/portfolio-app:${{ github.sha }} .
 
             # 4. Push to Docker Hub
             - name: Push image
-              run: docker push ${{ secrets.DOCKER_USERNAME }}/PortfolioCMS:latest
+              run: docker push ${{ secrets.DOCKER_USERNAME }}/portfolio-app:latest
 
             # - name: Deploy to Kubernetes
             #   run: |
