@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin · Visual Page Editor</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<body id="admin-body">
+    <div style="display:flex; justify-content:space-between; gap:16px; align-items:center; flex-wrap:wrap;">
+        <h1>Visual Page Editor — Home</h1>
+        <a href="/admin/logout.php" style="color:#fff;">Logout</a>
+    </div>
+
+    {{if .Error}}
+    <div class="box" style="margin-top: 20px; color: #ffb3b3;">
+        {{.Error}}
+    </div>
+    {{end}}
+
+    <form method="post" enctype="multipart/form-data">
+        <h2>Hero</h2>
+        <div class="box">
+            <label>Title</label>
+            <input name="hero_title" value="{{.HeroTitle}}">
+
+            <label>Tagline</label>
+            <textarea name="hero_tagline">{{.HeroTagline}}</textarea>
+
+            <label>Header Photo</label>
+            <div class="preview-wrap">
+                {{if .HeroPhoto}}
+                <img src="/uploads/{{.HeroPhoto}}" class="image-preview" id="hero-preview">
+                {{else}}
+                <img id="hero-preview" class="image-preview" style="display:none;">
+                {{end}}
+            </div>
+            <input type="file" name="hero_photo" accept="image/*" onchange="previewImage(this, 'hero-preview')">
+
+            <label>
+                <input type="checkbox" name="hero_enabled" {{if .HeroEnabled}}checked{{end}}>
+                Enabled
+            </label>
+        </div>
+
+        <h2>About</h2>
+        <div class="box">
+            <textarea name="about_text">{{.AboutText}}</textarea>
+        </div>
+
+        <h2>Skills</h2>
+        <div id="skills-container">
+            {{range .Skills}}
+            <div class="box skill-row">
+                <input name="skills[{{.Index}}]" value="{{.Value}}">
+                <button type="button" class="remove-skill">Remove</button>
+            </div>
+            {{end}}
+        </div>
+        <button type="button" id="add-skill">Add Skill</button>
+
+        <h2>Projects</h2>
+        <div id="projects-container">
+            {{range .Projects}}
+            <div class="box project-box">
+                <label>Title</label>
+                <input name="projects[{{.Index}}][title]" value="{{.Title}}">
+
+                <label>Description</label>
+                <textarea name="projects[{{.Index}}][description]">{{.Description}}</textarea>
+
+                <label>Image</label>
+                <div class="preview-wrap">
+                    {{if .Image}}
+                    <img src="/uploads/{{.Image}}" class="image-preview" id="project-preview-{{.Index}}">
+                    {{else}}
+                    <img id="project-preview-{{.Index}}" class="image-preview" style="display:none;">
+                    {{end}}
+                </div>
+
+                <input type="file"
+                    name="project_image_{{.Index}}"
+                    accept="image/*"
+                    onchange="previewImage(this, 'project-preview-{{.Index}}')">
+
+                <button type="button" class="remove-project">Remove</button>
+            </div>
+            {{end}}
+        </div>
+        <button type="button" id="add-project">Add Project</button>
+
+        <h2>Vision</h2>
+        <div class="box">
+            <textarea name="vision_text">{{.VisionText}}</textarea>
+        </div>
+
+        <h2>Contact</h2>
+        <div id="contact-container">
+            {{range .Contacts}}
+            <div class="box contact-row">
+                <input name="contact[{{.Index}}][name]" placeholder="Label" value="{{.Name}}">
+                <input name="contact[{{.Index}}][value]" placeholder="Value" value="{{.Value}}">
+                <button type="button" class="remove-contact">Remove</button>
+            </div>
+            {{end}}
+        </div>
+        <button type="button" id="add-contact">Add Contact</button>
+
+        <br>
+        <br>
+        <button type="submit">Save Changes</button>
+    </form>
+
+    <script>
+        function previewImage(input, targetId) {
+            const file = input.files && input.files[0];
+            const target = document.getElementById(targetId);
+            if (!file || !target) return;
+            target.src = URL.createObjectURL(file);
+            target.style.display = 'block';
+        }
+
+        function removeClosest(button, selector) {
+            const row = button.closest(selector);
+            if (row) row.remove();
+        }
+
+        document.addEventListener('click', function (event) {
+            if (event.target.classList.contains('remove-skill')) {
+                removeClosest(event.target, '.skill-row');
+            }
+            if (event.target.classList.contains('remove-project')) {
+                removeClosest(event.target, '.project-box');
+            }
+            if (event.target.classList.contains('remove-contact')) {
+                removeClosest(event.target, '.contact-row');
+            }
+        });
+
+        document.getElementById('add-skill').addEventListener('click', function () {
+            const container = document.getElementById('skills-container');
+            const index = container.querySelectorAll('.skill-row').length;
+            const row = document.createElement('div');
+            row.className = 'box skill-row';
+            row.innerHTML = `
+                <input name="skills[${index}]" value="">
+                <button type="button" class="remove-skill">Remove</button>
+            `;
+            container.appendChild(row);
+        });
+
+        document.getElementById('add-project').addEventListener('click', function () {
+            const container = document.getElementById('projects-container');
+            const index = container.querySelectorAll('.project-box').length;
+            const row = document.createElement('div');
+            row.className = 'box project-box';
+            row.innerHTML = `
+                <label>Title</label>
+                <input name="projects[${index}][title]" value="">
+                <label>Description</label>
+                <textarea name="projects[${index}][description]"></textarea>
+                <label>Image</label>
+                <div class="preview-wrap">
+                    <img id="project-preview-${index}" class="image-preview" style="display:none;">
+                </div>
+                <input type="file" name="project_image_${index}" accept="image/*" onchange="previewImage(this, 'project-preview-${index}')">
+                <button type="button" class="remove-project">Remove</button>
+            `;
+            container.appendChild(row);
+        });
+
+        document.getElementById('add-contact').addEventListener('click', function () {
+            const container = document.getElementById('contact-container');
+            const index = container.querySelectorAll('.contact-row').length;
+            const row = document.createElement('div');
+            row.className = 'box contact-row';
+            row.innerHTML = `
+                <input name="contact[${index}][name]" placeholder="Label" value="">
+                <input name="contact[${index}][value]" placeholder="Value" value="">
+                <button type="button" class="remove-contact">Remove</button>
+            `;
+            container.appendChild(row);
+        });
+    </script>
+</body>
+
+</html>

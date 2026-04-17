@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<body id="admin-body">
+    <div class="box" style="max-width:420px; margin:80px auto;">
+        <h1>Admin Login</h1>
+        {{if .Error}}
+        <p style="margin: 12px 0 16px; color: #ffb3b3;">{{.Error}}</p>
+        {{end}}
+        <form method="post">
+            <label>Username</label>
+            <input name="username" placeholder="Username" autocomplete="username">
+
+            <label>Password</label>
+            <input name="password" type="password" placeholder="Password" autocomplete="current-password">
+
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+
+</html>
