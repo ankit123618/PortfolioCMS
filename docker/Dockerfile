@@ -1,19 +1,25 @@
-FROM php:8.2-apache
+FROM golang:1.25-alpine AS builder
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends libzip-dev zip unzip \
-    && docker-php-ext-install pdo pdo_mysql \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR /src
 
-WORKDIR /var/www/html
+COPY go.mod go.sum ./
+RUN go mod download
 
-COPY ../. /var/www/html/
+COPY . ./
 
-RUN mkdir -p /var/www/html/uploads \
-    && chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /bin/portfolio-cms .
 
-EXPOSE 80
+FROM alpine:3.21
 
-CMD ["apache2-foreground"]
+WORKDIR /app
+
+COPY --from=builder /bin/portfolio-cms /app/portfolio-cms
+COPY public /app/public
+COPY templates /app/templates
+COPY uploads /app/uploads
+
+RUN mkdir -p /app/uploads
+
+EXPOSE 8080
+
+CMD ["/app/portfolio-cms"]

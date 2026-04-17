@@ -140,11 +140,10 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", a.handleHome)
-	mux.HandleFunc("/public/index.php", a.handleHome)
-	mux.HandleFunc("/public/api/get_page.php", a.handleGetPage)
-	mux.HandleFunc("/admin/login.php", a.handleLogin)
-	mux.HandleFunc("/admin/logout.php", a.handleLogout)
-	mux.HandleFunc("/admin/page_editor_visual.php", a.handleEditor)
+	mux.HandleFunc("/api/pages", a.handleGetPage)
+	mux.HandleFunc("/admin/login", a.handleLogin)
+	mux.HandleFunc("/admin/logout", a.handleLogout)
+	mux.HandleFunc("/admin/editor", a.handleEditor)
 	mux.Handle("/public/css/", http.StripPrefix("/public/css/", http.FileServer(http.Dir("public/css"))))
 	mux.Handle("/public/js/", http.StripPrefix("/public/js/", http.FileServer(http.Dir("public/js"))))
 	mux.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
@@ -238,7 +237,7 @@ func loggingMiddleware(next http.Handler) http.Handler {
 }
 
 func (a *app) handleHome(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" && r.URL.Path != "/public/index.php" {
+	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
 	}
@@ -295,7 +294,7 @@ func (a *app) handleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 
 		a.setAdminCookie(w)
-		http.Redirect(w, r, "/admin/page_editor_visual.php", http.StatusSeeOther)
+		http.Redirect(w, r, "/admin/editor", http.StatusSeeOther)
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
@@ -316,12 +315,12 @@ func (a *app) handleLogout(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	})
-	http.Redirect(w, r, "/admin/login.php", http.StatusSeeOther)
+	http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
 }
 
 func (a *app) handleEditor(w http.ResponseWriter, r *http.Request) {
 	if !a.isAdmin(r) {
-		http.Redirect(w, r, "/admin/login.php", http.StatusSeeOther)
+		http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
 		return
 	}
 
@@ -347,7 +346,7 @@ func (a *app) handleEditor(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.Redirect(w, r, "/admin/page_editor_visual.php", http.StatusSeeOther)
+		http.Redirect(w, r, "/admin/editor", http.StatusSeeOther)
 		return
 	}
 

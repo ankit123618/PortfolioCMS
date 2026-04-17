@@ -10,7 +10,7 @@
 
 const app = document.getElementById('app');
 
-fetch('/../public/api/get_page.php?slug=home')
+fetch('/api/pages?slug=home')
   .then(r => r.json())
   .then(page => {
     if (!page.sections) return;
@@ -45,7 +45,7 @@ function renderHero(section) {
       <p>${tagline}</p>
     </div>
     <div class="hero-photo">
-      <img src="../uploads/${section.data.photo}" alt="">
+      <img src="/uploads/${section.data.photo}" alt="">
     </div>
   `;
 
@@ -92,7 +92,7 @@ function renderProjects(section) {
     // Image
     if (project.image) {
       const img = document.createElement('img');
-      img.src = `../uploads/${project.image}`;
+      img.src = `/uploads/${project.image}`;
       img.alt = project.title || '';
       card.appendChild(img);
     }
@@ -227,4 +227,3 @@ function validateSection(section) {
     key => section.data && section.data[key] !== undefined
   );
 }
-

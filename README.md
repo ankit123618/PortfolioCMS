@@ -1,30 +1,26 @@
 # Portfolio CMS
 
-A simple PHP portfolio CMS with:
+A simple Go portfolio CMS with:
 - public homepage rendering from JSON schema stored in MySQL
-- admin visual page editor for the home page
+- an admin visual editor for the home page
 - image uploads stored in `uploads/`
 
 ## Project structure
 
-- `public/` — public website entrypoint
-  - `public/index.php` — SPA-like page loader
-  - `public/api/get_page.php` — API endpoint returning the page schema
+- `main.go` — Go HTTP server, routing, auth, uploads, and database logic
+- `templates/` — Go templates for the public page and admin screens
+- `public/` — static frontend assets
   - `public/js/renderer.js` — client-side renderer
   - `public/js/schema_contracts.js` — section validation rules
-- `admin/` — admin login and visual editor
-  - `admin/login.php` — admin authentication
-  - `admin/page_editor_visual.php` — home page editor
-- `config/db.php` — database connection
+  - `public/css/style.css` — frontend and admin styling
 - `uploads/` — uploaded image assets
 - `sql/schema.sql` — schema for initial database tables
-- `.env` — database credentials
+- `.env` — database credentials and app settings
 
 ## Requirements
 
-- PHP 8+
+- Go 1.25+
 - MySQL / MariaDB
-- Webserver or PHP built-in server
 
 ## Setup
 
@@ -33,21 +29,25 @@ A simple PHP portfolio CMS with:
    Import `sql/schema.sql` into your MySQL database:
 
    ```bash
-   mysql -u <user> -p < portfolio_cms/sql/schema.sql
+   mysql -u <user> -p < sql/schema.sql
    ```
 
-2. Configure database credentials
+2. Configure environment values
 
    Copy `.env` from `env_exmaple.txt` if needed, then update values:
 
    ```text
    DB_HOST=127.0.0.1
+   DB_PORT=3306
    DB_NAME=portfolio
-   DB_USER=your user
-   DB_PASS=your pass
+   DB_USER=your-user
+   DB_PASS=your-pass
+   DB_CHARSET=utf8mb4
+   APP_ADDR=:8080
+   APP_SECRET=change-me
    ```
 
-3. Ensure the `.env` file is readable by PHP and matches your MySQL credentials.
+3. Ensure `APP_SECRET` is stable in non-dev environments.
 
 4. If you need an admin user, insert one manually into `admin_users`.
 
@@ -55,52 +55,48 @@ A simple PHP portfolio CMS with:
 
    ```sql
    INSERT INTO admin_users (username, password)
-   VALUES ('admin', '<password_hash>');
+   VALUES ('admin', '<bcrypt_hash>');
    ```
 
-   Generate a password hash in PHP:
-
-   ```php
-   <?php
-   echo password_hash('your-password', PASSWORD_DEFAULT);
-   ```
-   
-## Run the app locally
+## Run locally
 
 From the project root:
 
 ```bash
-php -S 127.0.0.1:8000
+go run .
 ```
 
-Then open in your browser:
+Then open:
 
-- `http://127.0.0.1:8000/public/index.php` — public homepage
-- `http://127.0.0.1:8000/admin/login.php` — admin login
+- `http://127.0.0.1:8080/` — public homepage
+- `http://127.0.0.1:8080/admin/login` — admin login
+- `http://127.0.0.1:8080/admin/editor` — visual editor after login
 
-> Important: start the server from the repository root so `public/`, `admin/`, and `uploads/` are all available.
+> Important: start the server from the repository root so `public/`, `templates/`, and `uploads/` are available.
+
+> The credentials of admin user which is predefined for login is: username=>ankit, password=>admin123
 
 ## Notes
 
-- The homepage loads JSON schema from `public/api/get_page.php?slug=home`.
-- Uploaded images are saved under `uploads/` and referenced from the editor using `../uploads/...`.
-- The admin UI only edits the `home` page schema.
-- If `localhost` shows a blank page or 404, use `127.0.0.1:8000` and confirm the server is started from the project root.
+- The homepage loads JSON schema from `/api/pages?slug=home`.
+- Uploaded images are saved under `uploads/` and served from `/uploads/...`.
+- The admin UI edits only the `home` page schema.
+- No PHP files or PHP-style routes remain in the app.
 
 ## Troubleshooting
 
-- `port already in use`: another server is already running on `8000`. Stop it or use another port:
+- `port already in use`: choose another port:
 
   ```bash
-  php -S 127.0.0.1:8001
+  APP_ADDR=:8081 go run .
   ```
 
-- `404 Not Found` on `/`: use the full path `http://127.0.0.1:8000/public/index.php`.
-- Images missing: make sure the server root includes `uploads/` and the image file exists in `uploads/`.
-- Admin login fails: make sure an `admin_users` record exists and the password hash is correct.
+- `404 Not Found` on `/`: confirm the Go server is running and open `http://127.0.0.1:8080/`.
+- Images missing: make sure the file exists under `uploads/`.
+- Admin login fails: make sure an `admin_users` record exists and the password hash is a valid bcrypt hash.
 
 ## Maintenance
 
-- Edit page content from `admin/page_editor_visual.php` after login.
+- Edit page content from `/admin/editor` after login.
 - The editor saves schema updates to `pages.schema` and versions in `page_versions`.
 - Use `uploads/` for image files referenced by the page schema.

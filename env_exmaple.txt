@@ -1,4 +1,8 @@
-DB_PASS=secret  
+DB_HOST=127.0.0.1
+DB_PORT=3306
 DB_NAME=portfolio
-DB_HOST=127.0.0.1  | db
 DB_USER=ankit
+DB_PASS=secret
+DB_CHARSET=utf8mb4
+APP_ADDR=:8080
+APP_SECRET=change-me
