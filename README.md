@@ -2,7 +2,9 @@
 
 # V2.0
 
-- shift tech from php to golang
+- shift technology from php to golang
+- changed UI
+- fix database
 
 # About 
 A simple portfolio template with CMS:
