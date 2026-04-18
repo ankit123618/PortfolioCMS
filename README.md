@@ -12,6 +12,18 @@ A simple portfolio template with CMS:
 - an admin visual editor for the home page
 - image uploads stored in `uploads/`
 
+
+<table>
+  <tr>
+    <td width="58%" valign="top">
+      <img src="public/media/demo.gif" alt="PortfolioCMS demo" />
+    </td>
+    <td width="42%" valign="top">
+      <img src="public/media/preview.png" alt="PortfolioCMS screenshot 1" />
+    </td>
+  </tr>
+</table>
+
 ## Project structure
 
 - `main.go` — Go HTTP server, routing, auth, uploads, and database logic
