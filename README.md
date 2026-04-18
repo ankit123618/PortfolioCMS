@@ -1,5 +1,6 @@
-# Portfolio CMS
+# Portfolio CMS 
 
+# V2.0
 A simple Go portfolio CMS with:
 - public homepage rendering from JSON schema stored in MySQL
 - an admin visual editor for the home page
@@ -81,7 +82,6 @@ Then open:
 - The homepage loads JSON schema from `/api/pages?slug=home`.
 - Uploaded images are saved under `uploads/` and served from `/uploads/...`.
 - The admin UI edits only the `home` page schema.
-- No PHP files or PHP-style routes remain in the app.
 
 ## Troubleshooting
 
@@ -98,5 +98,5 @@ Then open:
 ## Maintenance
 
 - Edit page content from `/admin/editor` after login.
-- The editor saves schema updates to `pages.schema` and versions in `page_versions`.
+- The editor saves schema updates to `pages.schema`.
 - Use `uploads/` for image files referenced by the page schema.
