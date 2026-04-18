@@ -1,7 +1,11 @@
 # Portfolio CMS 
 
 # V2.0
-A simple Go portfolio CMS with:
+
+- shift tech from php to golang
+
+# About 
+A simple portfolio template with CMS:
 - public homepage rendering from JSON schema stored in MySQL
 - an admin visual editor for the home page
 - image uploads stored in `uploads/`
